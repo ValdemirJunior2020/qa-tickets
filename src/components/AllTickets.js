@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, addDoc } from "firebase/firestore";
 
-function AllTickets() {
+function AllTickets({ user, role }) {
   const [tickets, setTickets] = useState([]);
   const [checked, setChecked] = useState({});
   const [total, setTotal] = useState(0);
@@ -11,6 +11,7 @@ function AllTickets() {
   const [supervisor, setSupervisor] = useState("");
   const [message, setMessage] = useState("");
 
+  // ✅ React hook must be called first (not conditionally)
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "tickets"), (snapshot) => {
       const items = snapshot.docs.map((doc) => ({
@@ -22,6 +23,15 @@ function AllTickets() {
 
     return () => unsub();
   }, []);
+
+  // ✅ Block access for non-admins AFTER hooks
+  if (!user || role !== "admin") {
+    return (
+      <h2 style={{ textAlign: "center", marginTop: "100px", color: "red" }}>
+        ⛔ Access Denied: Admins Only
+      </h2>
+    );
+  }
 
   const handleCheck = (id, points) => {
     setChecked((prev) => {
@@ -80,7 +90,6 @@ function AllTickets() {
         onChange={(e) => setAgentName(e.target.value)}
         style={{ padding: 10, width: "100%", marginBottom: 10 }}
       />
-
       <input
         type="text"
         placeholder="Enter call center name"
@@ -88,7 +97,6 @@ function AllTickets() {
         onChange={(e) => setCallCenter(e.target.value)}
         style={{ padding: 10, width: "100%", marginBottom: 10 }}
       />
-
       <input
         type="text"
         placeholder="Enter supervisor name"
@@ -132,10 +140,7 @@ function AllTickets() {
 
       <h3>Total Points: {total}</h3>
 
-      <h3 style={{
-        color: total >= 90 ? "green" : "red",
-        fontWeight: "bold"
-      }}>
+      <h3 style={{ color: total >= 90 ? "green" : "red", fontWeight: "bold" }}>
         {total >= 90 ? "✅ PASS" : "❌ FAIL"}
       </h3>
 

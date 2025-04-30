@@ -8,6 +8,7 @@ import Dashboard from "./components/Dashboard";
 import AllTickets from "./components/AllTickets";
 import ViewScores from "./components/ViewScores";
 import ManageUsers from "./components/ManageUsers";
+import LandingPage from "./components/LandingPage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -51,7 +52,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard user={user} role={role} />} />
         <Route path="/tickets" element={<AllTickets user={user} role={role} />} />
         <Route path="/view-scores" element={<ViewScores user={user} role={role} />} />

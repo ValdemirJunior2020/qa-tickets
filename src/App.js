@@ -11,20 +11,23 @@ import ManageUsers from "./components/ManageUsers";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // null to avoid flashing
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
+
         const userRef = doc(db, "users", firebaseUser.uid);
         const docSnap = await getDoc(userRef);
 
         if (docSnap.exists()) {
-          setRole(docSnap.data().role);
+          const data = docSnap.data();
+          console.log("🔥 Role loaded from Firestore:", data);
+          setRole(data.role);
         } else {
-          // default to agent if no role found
+          console.warn("❌ No role document found — defaulting to agent");
           setRole("agent");
         }
       } else {
@@ -40,7 +43,7 @@ function App() {
   if (loading) {
     return (
       <h2 style={{ textAlign: "center", marginTop: "100px" }}>
-        🔄 Loading...
+        🔄 Loading user info...
       </h2>
     );
   }

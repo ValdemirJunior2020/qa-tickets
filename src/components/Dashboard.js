@@ -56,6 +56,12 @@ function Dashboard({ user }) {
           <button style={buttonStyle}>📝 Go to Evaluation</button>
         </Link>
 
+        <Link to="/view-scores">
+          <button style={{ ...buttonStyle, backgroundColor: "#17a2b8" }}>
+            📊 View QA Scores
+          </button>
+        </Link>
+
         {user?.email === "infojr.83@gmail.com" && (
           <Link to="/manage-users">
             <button style={{ ...buttonStyle, backgroundColor: "#6f42c1" }}>

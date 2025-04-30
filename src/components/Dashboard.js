@@ -6,15 +6,18 @@ import {
   onSnapshot,
   doc,
   deleteDoc,
-  updateDoc
+  updateDoc,
+  addDoc
 } from "firebase/firestore";
 
 function Dashboard({ user }) {
   const [tickets, setTickets] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
+  const [newText, setNewText] = useState("");
+  const [newPoints, setNewPoints] = useState("");
 
-  const allowedEditors = ["infojr.83@gmail.com", "karen@hotelplanner.com"];
+  const allowedEditors = ["infojr.83@gmail.com", "karen.caldas@hotelplanner.com", "April.Grantham@HotelPlanner.com"];
   const canEdit = user && allowedEditors.includes(user.email);
 
   useEffect(() => {
@@ -46,6 +49,25 @@ function Dashboard({ user }) {
     setEditText("");
   };
 
+  const handleAddGuideline = async () => {
+    if (!newText.trim() || !newPoints.trim()) {
+      alert("Please fill out both the text and points.");
+      return;
+    }
+    try {
+      await addDoc(collection(db, "tickets"), {
+        text: newText,
+        points: Number(newPoints),
+        createdAt: new Date(),
+      });
+      setNewText("");
+      setNewPoints("");
+    } catch (err) {
+      console.error("Error adding guideline:", err);
+      alert("Failed to add guideline.");
+    }
+  };
+
   return (
     <div style={{ padding: "30px", maxWidth: "800px", margin: "auto", fontFamily: "Arial, sans-serif" }}>
       <h2>Welcome, {user?.email}</h2>
@@ -70,6 +92,33 @@ function Dashboard({ user }) {
           </Link>
         )}
       </div>
+
+      {/* Add New Guideline */}
+      {canEdit && (
+        <div style={{ marginTop: "30px", marginBottom: "30px" }}>
+          <h3>Add New Guideline</h3>
+          <input
+            type="text"
+            placeholder="Enter guideline text"
+            value={newText}
+            onChange={(e) => setNewText(e.target.value)}
+            style={{ padding: "8px", width: "60%", marginRight: "10px" }}
+          />
+          <input
+            type="number"
+            placeholder="Points"
+            value={newPoints}
+            onChange={(e) => setNewPoints(e.target.value)}
+            style={{ padding: "8px", width: "100px", marginRight: "10px" }}
+          />
+          <button
+            onClick={handleAddGuideline}
+            style={{ padding: "8px 16px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "4px" }}
+          >
+            ➕ Add Guideline
+          </button>
+        </div>
+      )}
 
       {/* Ticket Guidelines List */}
       <h2 style={{ marginTop: "40px" }}>📋 Ticket Guidelines</h2>
